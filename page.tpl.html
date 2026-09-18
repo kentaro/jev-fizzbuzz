@@ -1,4 +1,4 @@
-<title>Jev の暗算</title>
+<title>Jev の FizzBuzz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
@@ -6,20 +6,18 @@
 :root{
   --paper:#F3F5F1; --grid:#DCE3E8; --ink:#1C2848; --soft:#5B6680; --rule:#C3CCD6;
   --pencil:#C33D2B; --fizz:#2D62B0; --buzz:#C9851A; --cellbg:#FFFFFF;
-  --fizz-t:rgba(45,98,176,.14); --buzz-t:rgba(201,133,26,.18);
+  --fizz-t:color-mix(in srgb,var(--fizz) 18%,var(--cellbg)); --buzz-t:color-mix(in srgb,var(--buzz) 22%,var(--cellbg));
   --display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
   --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#11151D; --grid:#1E2533; --ink:#E3E8F1; --soft:#98A3B8; --rule:#35405295;
+  --paper:#11151D; --grid:#1E2533; --ink:#E3E8F1; --soft:#98A3B8; --rule:#364152;
   --pencil:#F07A64; --fizz:#80A8EC; --buzz:#E9B45C; --cellbg:#171C27;
-  --fizz-t:rgba(128,168,236,.18); --buzz-t:rgba(233,180,92,.2);
 }}
 :root[data-theme="dark"]{
-  --paper:#11151D; --grid:#1E2533; --ink:#E3E8F1; --soft:#98A3B8; --rule:#35405295;
+  --paper:#11151D; --grid:#1E2533; --ink:#E3E8F1; --soft:#98A3B8; --rule:#364152;
   --pencil:#F07A64; --fizz:#80A8EC; --buzz:#E9B45C; --cellbg:#171C27;
-  --fizz-t:rgba(128,168,236,.18); --buzz-t:rgba(233,180,92,.2);
 }
 body{
   background-color:var(--paper);
@@ -29,53 +27,58 @@ body{
   padding-inline:16px; padding-block:40px 80px;
 }
 main{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:64px}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,84px);line-height:1.05;margin:0;letter-spacing:.01em}
-h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,4.4vw,32px);line-height:1.3;margin:0 0 8px;text-wrap:balance}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,8.5vw,80px);line-height:1.05;margin:0}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,4.2vw,30px);line-height:1.35;margin:0 0 6px;text-wrap:balance}
 p{margin:0;max-width:38em}
 .lede{font-size:18px}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
-.mono{font-family:var(--mono)}
-.hero{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--soft)}
+.hero,section{display:flex;flex-direction:column;gap:14px}
+.hero{gap:18px}
 .stats{display:flex;flex-wrap:wrap;gap:12px 36px;margin-top:6px}
-.stat b{display:block;font-family:var(--mono);font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat b{display:block;font-family:var(--mono);font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.25}
 .stat span{font-size:13px;color:var(--soft)}
-section{display:flex;flex-direction:column;gap:14px}
+.note{font-size:13px;color:var(--soft)}
 
-/* FizzBuzz grid */
-.fb{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:100%}
-.c{aspect-ratio:1;max-width:100%;background:var(--cellbg);border:1px solid var(--rule);display:flex;flex-direction:column;justify-content:space-between;padding:4px;position:relative;overflow:hidden}
+/* 1〜100 */
+.fb{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px}
+.c{aspect-ratio:1;max-width:100%;background:var(--cellbg);border:1px solid var(--rule);display:flex;flex-direction:column;justify-content:space-between;padding:4px;overflow:hidden}
 .c .n{font-family:var(--mono);font-size:10px;color:var(--soft)}
 .c .o{font-family:var(--display);font-size:clamp(7px,1.5vw,13px);line-height:1;white-space:nowrap}
 .c.FB .o{font-size:clamp(6px,1.15vw,11px)}
-.c.F{background:var(--fizz-t)} .c.F .o{color:var(--fizz)}
-.c.B{background:var(--buzz-t)} .c.B .o{color:var(--buzz)}
-.c.FB{background:linear-gradient(135deg,var(--fizz-t) 50%,var(--buzz-t) 50%)} .c.FB .o{color:var(--ink)}
+.F{background:var(--fizz-t)!important} .F .o{color:var(--fizz)}
+.B{background:var(--buzz-t)!important} .B .o{color:var(--buzz)}
+.FB{background:linear-gradient(135deg,var(--fizz-t) 50%,var(--buzz-t) 50%)!important} .FB .o{color:var(--ink)}
 .c .bars{display:flex;gap:2px;height:3px}
 .c .bars i{flex:1;background:var(--rule);position:relative}
 .c .bars i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--k)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--soft)}
-.legend i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-2px;border:1px solid var(--rule);background:var(--cellbg)}
+.legend i.F{background:var(--fizz)!important}.legend i.B{background:var(--buzz)!important}.legend i.FB{background:linear-gradient(135deg,var(--fizz) 50%,var(--buzz) 50%)!important}
 
 /* race */
 .race{display:flex;flex-direction:column;gap:18px}
-.lane{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.lane{display:flex;flex-direction:column;gap:6px}
 .lane .lbl{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}
 .lane .lbl b{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .track{height:22px;background:var(--cellbg);border:1px solid var(--rule);position:relative}
-.track i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);width:0;transition:width 0s}
+.track i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
 .track.slow i{background:var(--pencil)}
 button{font:inherit;font-size:14px;color:var(--ink);background:var(--cellbg);border:1px solid var(--ink);padding:6px 16px;cursor:pointer;align-self:flex-start}
 button:focus-visible{outline:2px solid var(--fizz);outline-offset:2px}
 
-/* heatmap */
-.hm-wrap{overflow-x:auto}
-table.hm{border-collapse:separate;border-spacing:3px;font-variant-numeric:tabular-nums;min-width:520px;width:100%}
-.hm th{font-weight:400;font-size:12px;color:var(--soft);padding:2px 4px;white-space:nowrap}
-.hm thead tr:first-child th{font-family:var(--body);font-weight:700;color:var(--ink);border-bottom:2px solid var(--ink);text-align:left}
-.hm td{font-family:var(--mono);font-size:12px;text-align:center;padding:6px 2px;border:1px solid var(--rule);background:var(--cellbg)}
-.hm td.lo{color:var(--pencil);font-weight:600}
-.hm th.row{text-align:right;font-family:var(--mono)}
-.note{font-size:13px;color:var(--soft)}
+/* 桁数ラダー */
+.ladder-wrap{overflow-x:auto}
+.ladder{display:grid;grid-template-columns:auto repeat(4,minmax(0,1fr)) auto;gap:6px 10px;align-items:center;min-width:560px}
+.ladder .h{font-size:12px;color:var(--soft);border-bottom:2px solid var(--ink);padding-bottom:4px}
+.ladder .h.k{font-weight:700;color:var(--ink)}
+.ladder .d{font-family:var(--mono);font-size:13px;text-align:right;white-space:nowrap}
+.ladder .acc{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.ladder .acc.lo{color:var(--pencil);font-weight:600}
+.dots{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:2px}
+.dot{aspect-ratio:1;background:var(--cellbg);border:1px solid var(--rule)}
+.dot.F{background:var(--fizz)!important}.dot.B{background:var(--buzz)!important}.dot.FB{background:linear-gradient(135deg,var(--fizz) 50%,var(--buzz) 50%)!important}
+.dot.x{outline:2px solid var(--pencil);outline-offset:0;z-index:1}
+.dot.empty{visibility:hidden}
 
 /* examples */
 .ex{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:10px}
@@ -86,51 +89,53 @@ table.hm{border-collapse:separate;border-spacing:3px;font-variant-numeric:tabula
 
 .method{font-size:14px;color:var(--soft);border-top:2px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:6px}
 .method code{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
-@media (prefers-reduced-motion:reduce){.track i{transition:none!important}}
+.method a{color:var(--ink)}
 </style>
 
 <main>
   <header class="hero">
     <div class="eyebrow">Jev × FizzBuzz · 2026-09-18 実測</div>
-    <h1>Jev の暗算</h1>
-    <p class="lede">「3で割り切れるか」「5で割り切れるか」だけを Jev に聞いて FizzBuzz を組んだ。割り算はコードで一切やらない。1〜100 は全問正解。数を大きくしていくと、Jev がどこから暗算できなくなるかが見えてきた。</p>
+    <h1>Jev の FizzBuzz</h1>
+    <p class="lede">Jev に聞くのは「3で割り切れるか」「5で割り切れるか」の2つだけ。その答えで Fizz / Buzz / FizzBuzz を決める。割り算はコードで一切やらない。</p>
     <div class="stats" id="stats"></div>
   </header>
 
   <section>
     <div class="eyebrow">1〜100 · 200問を1リクエスト</div>
-    <h2>Jev が出した FizzBuzz</h2>
-    <p>各マスの下の2本の線は、Jev が答えた「3で割り切れる」「5で割り切れる」の確率。0.5 以上なら Fizz / Buzz にしている。</p>
-    <div class="fb" id="fb" role="img" aria-label="Jev の FizzBuzz 1〜100"></div>
-    <div class="legend"><span><i style="background:var(--fizz)"></i>Fizz / ÷3 の確率</span><span><i style="background:var(--buzz)"></i>Buzz / ÷5 の確率</span></div>
+    <h2>1〜100 は全問正解</h2>
+    <p>各マスの下の2本の線は、Jev が答えた「3で割り切れる」「5で割り切れる」の確率。0.5 以上なら割り切れるとみなす。</p>
+    <div class="fb" id="fb" role="img" aria-label="Jev が出した FizzBuzz 1〜100"></div>
+    <div class="legend"><span><i style="background:var(--fizz)"></i>÷3 の確率</span><span><i style="background:var(--buzz)"></i>÷5 の確率</span></div>
   </section>
 
   <section>
-    <div class="eyebrow">レイテンシ</div>
+    <div class="eyebrow">レイテンシ · 1〜100 の200問</div>
     <h2>まとめて聞くと、1問ずつ聞くより100倍以上速い</h2>
-    <p>同じ200問を、1リクエストにまとめて投げた場合と、1問ずつ200回投げた場合。横棒は実時間の比率のまま。</p>
+    <p>同じ200問を1リクエストにまとめた場合と、1問ずつ200回投げた場合。横棒は実時間の比率のまま。</p>
     <div class="race" id="race"></div>
     <button type="button" id="replay">もう一度走らせる（実時間の 1/10 で再生）</button>
   </section>
 
   <section>
-    <div class="eyebrow">桁数 × 割る数 · 各マス20問（1桁は9問）· 半分は割り切れる数</div>
-    <h2>末尾を見れば分かる割り算は30桁でも解ける。桁の和が要る割り算は崩れる</h2>
-    <p>各マスは正答数。割り切れる数と割り切れない数を半々にしてあるので、当てずっぽうなら 50%。赤字は 60% 以下。</p>
-    <div class="hm-wrap"><table class="hm" id="hm"></table></div>
-    <p class="note" id="d11note"></p>
+    <div class="eyebrow">桁数を増やす · 各桁 FizzBuzz / Fizz / Buzz / 数字 を15個ずつ · 1桁数ぶんを1リクエスト</div>
+    <h2>8桁までは全問正解。桁が増えると、3の倍数でない数にも Fizz と言い出す</h2>
+    <p>列は正解の種類、マスの色は Jev の答え、赤枠が間違い。桁が増えると「数字」の列に青（Fizz）が、「Buzz」の列に FizzBuzz が混ざる。5で割り切れるかの判定は、どの桁数でも60問中52問以上当たっている。</p>
+    <div class="ladder-wrap"><div class="ladder" id="ladder"></div></div>
+    <div class="legend">
+      <span><i class="FB"></i>Jev の答え FizzBuzz</span><span><i class="F"></i>Fizz</span><span><i class="B"></i>Buzz</span><span><i></i>数字</span><span><i style="outline:2px solid var(--pencil);outline-offset:-1px"></i>間違い</span>
+    </div>
   </section>
 
   <section>
-    <div class="eyebrow">20桁 · ÷3 の間違い</div>
-    <h2>20桁になると、÷5 は当たり続け、÷3 は当てずっぽうになる</h2>
-    <p>Jev は判断の確率だけを返し、途中計算を書かない。末尾を見れば決まる ÷2・÷5・÷10 は30桁でも当たる。全桁を足さないと決まらない ÷3 は20桁以降、÷9 は15桁以降で当てずっぽう並み（20問中6〜12問）に落ちる。下は20桁で ÷3 を外した例。</p>
+    <div class="eyebrow">30桁で外した例</div>
+    <h2>5の倍数は末尾を見れば分かる。3の倍数は全桁を足さないと分からない</h2>
+    <p>Jev は判断の確率だけを返し、途中の計算を書かない。末尾が 0 か 5 かで決まる ÷5 は30桁でも当たり、30桁ぶんの数字の和で決まる ÷3 は外れる。</p>
     <div class="ex" id="ex"></div>
   </section>
 
   <footer class="method">
-    <div>モデル <code>typesafe/jev-latest</code>（ロリポップ！AIゲートウェイ <code>POST /v1/systemone</code>）。質問はすべて <code>noul</code> 型（割り切れる確率）で、閾値は 0.5。</div>
-    <div>コード: <code>~/src/github.com/kentaro/jev-fizzbuzz</code> の <code>fizzbuzz.py</code>（1〜100・大きい数・バラ投げ）と <code>ladder.py</code>（桁数×割る数）。生ログは <code>results/*.jsonl</code>。剰余計算は問題作りと採点だけに使っている。</div>
+    <div>モデル <code>typesafe/jev-latest</code>（ロリポップ！AIゲートウェイ <code>POST /v1/systemone</code>）。質問は <code>noul</code> 型（割り切れる確率）、閾値 0.5。</div>
+    <div>コードと生ログ: <a href="https://github.com/kentaro/jev-fizzbuzz">github.com/kentaro/jev-fizzbuzz</a>。剰余計算は問題作りと採点だけに使っている。</div>
   </footer>
 </main>
 
@@ -138,34 +143,33 @@ table.hm{border-collapse:separate;border-spacing:3px;font-variant-numeric:tabula
 const D = /*DATA*/null;
 const $ = id => document.getElementById(id);
 const fmt = ms => ms >= 10000 ? (ms/1000).toFixed(1) + " 秒" : Math.round(ms) + " ms";
+const cls = s => s === "FizzBuzz" ? "FB" : s === "Fizz" ? "F" : s === "Buzz" ? "B" : "";
+const isNum = s => /^\d+$/.test(s);
 
 // stats
-const bms = D.batch_ms, bmin = Math.min(...bms), bmax = Math.max(...bms);
-const correct = D.grid.filter(r => r.got === (r.n%15==0?"FizzBuzz":r.n%3==0?"Fizz":r.n%5==0?"Buzz":String(r.n))).length;
+const bms = D.batch_ms, S = D.steps;
+const allOk = S.filter(s => s.fizzbuzz === s.n).map(s => s.digits);
+const last = S[S.length - 1];
 $("stats").innerHTML = [
-  [correct + " / 100", "1〜100 の正解数"],
-  [bmin + "–" + bmax + " ms", "200問まとめて1回（" + bms.length + "回計測）"],
-  [(D.single.wall_ms/1000).toFixed(1) + " 秒", "1問ずつ200回（逐次）"],
+  ["100 / 100", "1〜100 の正解数"],
+  [Math.min(...bms) + "–" + Math.max(...bms) + " ms", "200問まとめて1回（" + bms.length + "回計測）"],
+  [Math.max(...allOk) + " 桁", "全問正解だった最大の桁数"],
+  [last.fizzbuzz + " / " + last.n, last.digits + "桁の正解数"],
 ].map(([v,l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
 
-// grid
-$("fb").innerHTML = D.grid.map(r => {
-  const cls = r.got === "FizzBuzz" ? "FB" : r.got === "Fizz" ? "F" : r.got === "Buzz" ? "B" : "";
-  const out = cls ? r.got : "";
-  return `<div class="c ${cls}" title="${r.n}: ÷3 ${r.p3.toFixed(2)} / ÷5 ${r.p5.toFixed(2)}"><span class="n">${r.n}</span><span class="o">${out}</span>
-    <span class="bars"><i style="--w:${r.p3*100}%;--k:var(--fizz)"></i><i style="--w:${r.p5*100}%;--k:var(--buzz)"></i></span></div>`;
-}).join("");
+// 1〜100
+$("fb").innerHTML = D.grid.map(r => `<div class="c ${cls(r.got)}" title="${r.n}: ÷3 ${r.p3.toFixed(2)} / ÷5 ${r.p5.toFixed(2)}">
+  <span class="n">${r.n}</span><span class="o">${cls(r.got) ? r.got : ""}</span>
+  <span class="bars"><i style="--w:${r.p3*100}%;--k:var(--fizz)"></i><i style="--w:${r.p5*100}%;--k:var(--buzz)"></i></span></div>`).join("");
 
 // race
 const lanes = [
-  {lbl:"まとめて1回（200問）", ms:D.grid_ms, sub:"", cls:""},
-  {lbl:"1問ずつ200回", ms:D.single.wall_ms, sub:`1回あたり p50 ${D.single.p50} ms / p95 ${D.single.p95} ms`, cls:"slow"},
+  {lbl:"まとめて1回", ms:D.grid_ms, sub:"", slow:false},
+  {lbl:"1問ずつ200回（逐次）", ms:D.single.wall_ms, sub:`1回あたり p50 ${D.single.p50} ms / p95 ${D.single.p95} ms`, slow:true},
 ];
-$("race").innerHTML = lanes.map((l,i) => `<div class="lane"><div class="lbl"><span>${l.lbl}</span><b>${fmt(l.ms)}</b></div>
-  <div class="track ${l.cls}"><i id="bar${i}"></i></div>${l.sub?`<span class="note">${l.sub}</span>`:""}</div>`).join("");
 const maxMs = Math.max(...lanes.map(l => l.ms));
-function settle(){ lanes.forEach((l,i) => { const b=$("bar"+i); b.style.transition="none"; b.style.width = (l.ms/maxMs*100) + "%"; }); }
-settle();
+$("race").innerHTML = lanes.map((l,i) => `<div class="lane"><div class="lbl"><span>${l.lbl}</span><b>${fmt(l.ms)}</b></div>
+  <div class="track ${l.slow?"slow":""}"><i id="bar${i}" style="width:${l.ms/maxMs*100}%"></i></div>${l.sub?`<span class="note">${l.sub}</span>`:""}</div>`).join("");
 $("replay").addEventListener("click", () => {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   lanes.forEach((l,i) => { const b=$("bar"+i); b.style.transition="none"; b.style.width="0"; });
@@ -174,25 +178,30 @@ $("replay").addEventListener("click", () => {
   })));
 });
 
-// heatmap
-const groups = [["末尾で分かる",[2,5,10]],["末尾2桁",[4]],["桁の和",[3,9]],["交代和",[11]]];
-let h = "<thead><tr><th></th>" + groups.map(([g,ds]) => `<th colspan="${ds.length}">${g}</th>`).join("") + "</tr>";
-h += "<tr><th class=row>桁数</th>" + groups.flatMap(([,ds]) => ds.map(d => `<th>÷${d}</th>`)).join("") + "</tr></thead><tbody>";
-for (const dg of D.digits) {
-  h += `<tr><th class="row">${dg}</th>`;
-  for (const [,ds] of groups) for (const d of ds) {
-    const [ok,n] = D.cells[dg+"_"+d]; const r = ok/n;
-    const t = Math.max(0, Math.min(1, (r-0.5)/0.5));
-    const bg = `color-mix(in srgb, var(--ink) ${Math.round(t*t*22)}%, var(--cellbg))`;
-    h += `<td class="${r<=0.6?"lo":""}" style="background:${bg}" title="${dg}桁 ÷${d}: ${ok}/${n}">${ok}/${n}</td>`;
+// ladder
+const kinds = [["FizzBuzz","FizzBuzz"],["Fizz","Fizz"],["Buzz","Buzz"],["number","数字"]];
+const kindOf = w => isNum(w) ? "number" : w;
+let h = `<div class="h">桁数</div>` + kinds.map(([,l]) => `<div class="h k">正解 ${l}</div>`).join("") + `<div class="h" style="text-align:right">正解数</div>`;
+for (const s of S) {
+  h += `<div class="d">${s.digits}</div>`;
+  for (const [k] of kinds) {
+    const cells = s.items.filter(i => kindOf(i.want) === k).map(i =>
+      `<span class="dot ${cls(i.got)} ${i.got===i.want?"":"x"}" title="${i.n}&#10;Jev: ${isNum(i.got)?"数字":i.got}（÷3 ${i.p3.toFixed(2)} / ÷5 ${i.p5.toFixed(2)}）"></span>`);
+    while (cells.length < 15) cells.push(`<span class="dot empty"></span>`);
+    h += `<div class="dots">${cells.join("")}</div>`;
   }
-  h += "</tr>";
+  h += `<div class="acc ${s.fizzbuzz / s.n < 0.9 ? "lo" : ""}">${s.fizzbuzz}/${s.n}</div>`;
 }
-$("hm").innerHTML = h + "</tbody>";
-$("d11note").textContent = `÷11 は5桁から崩れる。6桁では ${D.d11_6.total}問中 ${D.d11_6.divisible}問が割り切れる数だったが、Jev が「割り切れる」と答えたのは ${D.d11_6.yes_said}問。分からないときは「いいえ」に倒れる。`;
+$("ladder").innerHTML = h;
 
-// examples
-$("ex").innerHTML = D.examples.map(e => `<div><span class="num">${e.n}</span>
-  <span class="v">Jev: 割り切れる確率 ${e.p.toFixed(2)} → <em>${e.p>=0.5?"割り切れる":"割り切れない"}</em>　正解: ${e.truth?"割り切れる":"割り切れない"}</span>
-  <span class="note">桁の和 ${e.digitsum}（${e.digitsum%3===0?"3の倍数":"3の倍数でない"}）</span></div>`).join("");
+// 30桁で外した例: 数字→Fizz と Buzz→FizzBuzz を2つずつ
+const name = w => isNum(w) ? "数字のまま" : w;
+const wrong = last.items.filter(i => i.got !== i.want);
+const ex = [...wrong.filter(i => isNum(i.want) && i.got === "Fizz").slice(0,2), ...wrong.filter(i => i.want === "Buzz" && i.got === "FizzBuzz").slice(0,2)];
+$("ex").innerHTML = ex.map(e => {
+  const ds = [...e.n].reduce((a,c) => a + +c, 0);
+  return `<div><span class="num">${e.n}</span>
+  <span class="v">Jev: <em>${name(e.got)}</em>　正解: ${name(e.want)}</span>
+  <span class="note">÷3 の確率 ${e.p3.toFixed(2)} · ÷5 の確率 ${e.p5.toFixed(2)} · 桁の和 ${ds}（3の倍数でない）· 末尾 ${e.n.slice(-1)}</span></div>`;
+}).join("");
 </script>

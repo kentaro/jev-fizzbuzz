@@ -1,8 +1,7 @@
-"""Jev の暗算の限界マップ: 桁数 × 割る数 ごとに「割り切れるか」を判断させ、正答率を測る。
+"""桁数を増やしながら FizzBuzz を解かせ、Jev が何桁まで正しく答えられるかを測る。
 
-割る数の選び方: 末尾だけ見れば分かる (2, 5, 10) / 末尾2桁 (4) / 桁の和 (3, 9) / 交代和 (11)。
-各マスは割り切れる数と割り切れない数を半々にした 20 個（偶然の正答率が 50% になるように）。
-1リクエストに1桁数ぶん（7割る数 × 20個 = 140問）をまとめて投げる。剰余計算は問題作りと採点だけに使う。
+各桁数で FizzBuzz / Fizz / Buzz / 数字 の4種類を15個ずつ（2桁は FizzBuzz が6個しかないので6個）選び、
+「3で割り切れるか」「5で割り切れるか」をまとめて1リクエストで投げる。剰余計算は問題作りと採点だけに使う。
 
   AI_GATEWAY_API_KEY_FILE=<キーのファイル> python3 ladder.py
 """
@@ -11,52 +10,49 @@ import pathlib
 import random
 
 import jev
+from fizzbuzz import STATE, fizzbuzz_from, questions_for, truth
 
-DIVISORS = [2, 3, 4, 5, 9, 10, 11]
-DIGITS = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30]
-PER_CELL = 20
-STATE = {"task": "整数の割り算の判定。各質問の数が指定の数で割り切れる（余りが0）かを答える"}
+DIGITS = [2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30]
+PER_KIND = 15
 OUT = pathlib.Path(__file__).parent / "results" / "ladder.jsonl"
 
 
-def sample(rng, digits, d, want_divisible, k):
-    lo, hi = (1 if digits == 1 else 10 ** (digits - 1)), 10 ** digits - 1
-    pool = [n for n in range(lo, hi + 1) if (n % d == 0) == want_divisible] if digits <= 2 else None
-    out = set()
-    while len(out) < k:
-        if pool is not None:
-            if len(out) >= len(pool):
-                break
-            out.add(rng.choice(pool))
-            continue
+def pick(rng, digits):
+    lo, hi = 10 ** (digits - 1), 10 ** digits - 1
+    kinds = {"FizzBuzz": set(), "Fizz": set(), "Buzz": set(), "number": set()}
+    if digits <= 2:
+        for n in range(lo, hi + 1):
+            kinds[truth(n) if not truth(n).isdigit() else "number"].add(n)
+        return sorted(n for s in kinds.values() for n in rng.sample(sorted(s), min(PER_KIND, len(s))))
+    while any(len(s) < PER_KIND for s in kinds.values()):
         n = rng.randint(lo, hi)
-        if (n % d == 0) == want_divisible:
-            out.add(n)
-    return sorted(out)
+        k = truth(n) if not truth(n).isdigit() else "number"
+        if len(kinds[k]) < PER_KIND:
+            kinds[k].add(n)
+    return sorted(n for s in kinds.values() for n in s)
 
 
 def main():
     rng = random.Random(125841)
     OUT.parent.mkdir(exist_ok=True)
     for digits in DIGITS:
-        qs, meta = {}, {}
-        for d in DIVISORS:
-            nums = sample(rng, digits, d, True, PER_CELL // 2) + sample(rng, digits, d, False, PER_CELL // 2)
-            for i, n in enumerate(nums):
-                key = f"d{d}_{i}"
-                qs[key] = {"type": "noul", "instructions": f"{n} は {d} で割り切れるか？"}
-                meta[key] = (d, n)
-        status, ms, data = jev.call(STATE, qs, timeout=120)
-        rec = {"digits": digits, "status": status, "ms": round(ms), "questions": len(qs), "usage": data.get("usage"),
-               "error": data.get("error"), "items": []}
+        nums = pick(rng, digits)
+        status, ms, data = jev.call(STATE, questions_for(nums), timeout=120)
+        rec = {"digits": digits, "status": status, "ms": round(ms), "questions": len(nums) * 2,
+               "usage": data.get("usage"), "error": data.get("error"), "items": []}
         if status == 200:
-            for key, (d, n) in meta.items():
-                p = data["answers"][key]["noul"]
-                rec["items"].append({"d": d, "n": str(n), "p": p, "truth": n % d == 0, "ok": (p >= 0.5) == (n % d == 0)})
+            a = data["answers"]
+            for n in nums:
+                p3, p5 = a[f"n{n}_3"]["noul"], a[f"n{n}_5"]["noul"]
+                got = fizzbuzz_from(p3, p5, n)
+                rec["items"].append({"n": str(n), "p3": p3, "p5": p5, "got": got, "want": truth(n), "ok": got == truth(n),
+                                     "ok3": (p3 >= 0.5) == (n % 3 == 0), "ok5": (p5 >= 0.5) == (n % 5 == 0)})
         with open(OUT, "a") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-        acc = {d: sum(i["ok"] for i in rec["items"] if i["d"] == d) for d in DIVISORS}
-        print(json.dumps({"digits": digits, "status": status, "ms": rec["ms"], "correct_of_20": acc}))
+        it = rec["items"]
+        print(json.dumps({"digits": digits, "status": status, "ms": rec["ms"], "n": len(it),
+                          "fizzbuzz": sum(i["ok"] for i in it), "div3": sum(i["ok3"] for i in it),
+                          "div5": sum(i["ok5"] for i in it)}))
 
 
 if __name__ == "__main__":
