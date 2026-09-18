@@ -1,0 +1,198 @@
+<title>Jev の暗算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#F3F5F1; --grid:#DCE3E8; --ink:#1C2848; --soft:#5B6680; --rule:#C3CCD6;
+  --pencil:#C33D2B; --fizz:#2D62B0; --buzz:#C9851A; --cellbg:#FFFFFF;
+  --fizz-t:rgba(45,98,176,.14); --buzz-t:rgba(201,133,26,.18);
+  --display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#11151D; --grid:#1E2533; --ink:#E3E8F1; --soft:#98A3B8; --rule:#35405295;
+  --pencil:#F07A64; --fizz:#80A8EC; --buzz:#E9B45C; --cellbg:#171C27;
+  --fizz-t:rgba(128,168,236,.18); --buzz-t:rgba(233,180,92,.2);
+}}
+:root[data-theme="dark"]{
+  --paper:#11151D; --grid:#1E2533; --ink:#E3E8F1; --soft:#98A3B8; --rule:#35405295;
+  --pencil:#F07A64; --fizz:#80A8EC; --buzz:#E9B45C; --cellbg:#171C27;
+  --fizz-t:rgba(128,168,236,.18); --buzz-t:rgba(233,180,92,.2);
+}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.75;
+  padding-inline:16px; padding-block:40px 80px;
+}
+main{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:64px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,9vw,84px);line-height:1.05;margin:0;letter-spacing:.01em}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,4.4vw,32px);line-height:1.3;margin:0 0 8px;text-wrap:balance}
+p{margin:0;max-width:38em}
+.lede{font-size:18px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.mono{font-family:var(--mono)}
+.hero{display:flex;flex-direction:column;gap:18px}
+.stats{display:flex;flex-wrap:wrap;gap:12px 36px;margin-top:6px}
+.stat b{display:block;font-family:var(--mono);font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:13px;color:var(--soft)}
+section{display:flex;flex-direction:column;gap:14px}
+
+/* FizzBuzz grid */
+.fb{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:100%}
+.c{aspect-ratio:1;max-width:100%;background:var(--cellbg);border:1px solid var(--rule);display:flex;flex-direction:column;justify-content:space-between;padding:4px;position:relative;overflow:hidden}
+.c .n{font-family:var(--mono);font-size:10px;color:var(--soft)}
+.c .o{font-family:var(--display);font-size:clamp(7px,1.5vw,13px);line-height:1;white-space:nowrap}
+.c.FB .o{font-size:clamp(6px,1.15vw,11px)}
+.c.F{background:var(--fizz-t)} .c.F .o{color:var(--fizz)}
+.c.B{background:var(--buzz-t)} .c.B .o{color:var(--buzz)}
+.c.FB{background:linear-gradient(135deg,var(--fizz-t) 50%,var(--buzz-t) 50%)} .c.FB .o{color:var(--ink)}
+.c .bars{display:flex;gap:2px;height:3px}
+.c .bars i{flex:1;background:var(--rule);position:relative}
+.c .bars i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--k)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--soft)}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+
+/* race */
+.race{display:flex;flex-direction:column;gap:18px}
+.lane{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.lane .lbl{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}
+.lane .lbl b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.track{height:22px;background:var(--cellbg);border:1px solid var(--rule);position:relative}
+.track i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);width:0;transition:width 0s}
+.track.slow i{background:var(--pencil)}
+button{font:inherit;font-size:14px;color:var(--ink);background:var(--cellbg);border:1px solid var(--ink);padding:6px 16px;cursor:pointer;align-self:flex-start}
+button:focus-visible{outline:2px solid var(--fizz);outline-offset:2px}
+
+/* heatmap */
+.hm-wrap{overflow-x:auto}
+table.hm{border-collapse:separate;border-spacing:3px;font-variant-numeric:tabular-nums;min-width:520px;width:100%}
+.hm th{font-weight:400;font-size:12px;color:var(--soft);padding:2px 4px;white-space:nowrap}
+.hm thead tr:first-child th{font-family:var(--body);font-weight:700;color:var(--ink);border-bottom:2px solid var(--ink);text-align:left}
+.hm td{font-family:var(--mono);font-size:12px;text-align:center;padding:6px 2px;border:1px solid var(--rule);background:var(--cellbg)}
+.hm td.lo{color:var(--pencil);font-weight:600}
+.hm th.row{text-align:right;font-family:var(--mono)}
+.note{font-size:13px;color:var(--soft)}
+
+/* examples */
+.ex{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:10px}
+.ex div{background:var(--cellbg);border:1px solid var(--rule);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.ex .num{font-family:var(--mono);font-size:15px;word-break:break-all}
+.ex .v{font-size:13px}
+.ex .v em{font-style:normal;color:var(--pencil);font-weight:700}
+
+.method{font-size:14px;color:var(--soft);border-top:2px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.method code{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.track i{transition:none!important}}
+</style>
+
+<main>
+  <header class="hero">
+    <div class="eyebrow">Jev × FizzBuzz · 2026-09-18 実測</div>
+    <h1>Jev の暗算</h1>
+    <p class="lede">「3で割り切れるか」「5で割り切れるか」だけを Jev に聞いて FizzBuzz を組んだ。割り算はコードで一切やらない。1〜100 は全問正解。数を大きくしていくと、Jev がどこから暗算できなくなるかが見えてきた。</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section>
+    <div class="eyebrow">1〜100 · 200問を1リクエスト</div>
+    <h2>Jev が出した FizzBuzz</h2>
+    <p>各マスの下の2本の線は、Jev が答えた「3で割り切れる」「5で割り切れる」の確率。0.5 以上なら Fizz / Buzz にしている。</p>
+    <div class="fb" id="fb" role="img" aria-label="Jev の FizzBuzz 1〜100"></div>
+    <div class="legend"><span><i style="background:var(--fizz)"></i>Fizz / ÷3 の確率</span><span><i style="background:var(--buzz)"></i>Buzz / ÷5 の確率</span></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">レイテンシ</div>
+    <h2>まとめて聞くと、1問ずつ聞くより100倍以上速い</h2>
+    <p>同じ200問を、1リクエストにまとめて投げた場合と、1問ずつ200回投げた場合。横棒は実時間の比率のまま。</p>
+    <div class="race" id="race"></div>
+    <button type="button" id="replay">もう一度走らせる（実時間の 1/10 で再生）</button>
+  </section>
+
+  <section>
+    <div class="eyebrow">桁数 × 割る数 · 各マス20問（1桁は9問）· 半分は割り切れる数</div>
+    <h2>末尾を見れば分かる割り算は30桁でも解ける。桁の和が要る割り算は崩れる</h2>
+    <p>各マスは正答数。割り切れる数と割り切れない数を半々にしてあるので、当てずっぽうなら 50%。赤字は 60% 以下。</p>
+    <div class="hm-wrap"><table class="hm" id="hm"></table></div>
+    <p class="note" id="d11note"></p>
+  </section>
+
+  <section>
+    <div class="eyebrow">20桁 · ÷3 の間違い</div>
+    <h2>20桁になると、÷5 は当たり続け、÷3 は当てずっぽうになる</h2>
+    <p>Jev は判断の確率だけを返し、途中計算を書かない。末尾を見れば決まる ÷2・÷5・÷10 は30桁でも当たる。全桁を足さないと決まらない ÷3・÷9 は、15〜20桁で正答率が50%前後に落ちる。下は20桁で ÷3 を外した例。</p>
+    <div class="ex" id="ex"></div>
+  </section>
+
+  <footer class="method">
+    <div>モデル <code>typesafe/jev-latest</code>（ロリポップ！AIゲートウェイ <code>POST /v1/systemone</code>）。質問はすべて <code>noul</code> 型（割り切れる確率）で、閾値は 0.5。</div>
+    <div>コード: <code>~/src/github.com/kentaro/jev-fizzbuzz</code> の <code>fizzbuzz.py</code>（1〜100・大きい数・バラ投げ）と <code>ladder.py</code>（桁数×割る数）。生ログは <code>results/*.jsonl</code>。剰余計算は問題作りと採点だけに使っている。</div>
+  </footer>
+</main>
+
+<script>
+const D = /*DATA*/null;
+const $ = id => document.getElementById(id);
+const fmt = ms => ms >= 10000 ? (ms/1000).toFixed(1) + " 秒" : Math.round(ms) + " ms";
+
+// stats
+const bms = D.batch_ms, bmin = Math.min(...bms), bmax = Math.max(...bms);
+const correct = D.grid.filter(r => r.got === (r.n%15==0?"FizzBuzz":r.n%3==0?"Fizz":r.n%5==0?"Buzz":String(r.n))).length;
+$("stats").innerHTML = [
+  [correct + " / 100", "1〜100 の正解数"],
+  [bmin + "–" + bmax + " ms", "200問まとめて1回（" + bms.length + "回計測）"],
+  [(D.single.wall_ms/1000).toFixed(1) + " 秒", "1問ずつ200回（逐次）"],
+].map(([v,l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+
+// grid
+$("fb").innerHTML = D.grid.map(r => {
+  const cls = r.got === "FizzBuzz" ? "FB" : r.got === "Fizz" ? "F" : r.got === "Buzz" ? "B" : "";
+  const out = cls ? r.got : "";
+  return `<div class="c ${cls}" title="${r.n}: ÷3 ${r.p3.toFixed(2)} / ÷5 ${r.p5.toFixed(2)}"><span class="n">${r.n}</span><span class="o">${out}</span>
+    <span class="bars"><i style="--w:${r.p3*100}%;--k:var(--fizz)"></i><i style="--w:${r.p5*100}%;--k:var(--buzz)"></i></span></div>`;
+}).join("");
+
+// race
+const lanes = [
+  {lbl:"まとめて1回（200問）", ms:D.grid_ms, sub:"", cls:""},
+  {lbl:"1問ずつ200回", ms:D.single.wall_ms, sub:`1回あたり p50 ${D.single.p50} ms / p95 ${D.single.p95} ms`, cls:"slow"},
+];
+$("race").innerHTML = lanes.map((l,i) => `<div class="lane"><div class="lbl"><span>${l.lbl}</span><b>${fmt(l.ms)}</b></div>
+  <div class="track ${l.cls}"><i id="bar${i}"></i></div>${l.sub?`<span class="note">${l.sub}</span>`:""}</div>`).join("");
+const maxMs = Math.max(...lanes.map(l => l.ms));
+function settle(){ lanes.forEach((l,i) => { const b=$("bar"+i); b.style.transition="none"; b.style.width = (l.ms/maxMs*100) + "%"; }); }
+settle();
+$("replay").addEventListener("click", () => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  lanes.forEach((l,i) => { const b=$("bar"+i); b.style.transition="none"; b.style.width="0"; });
+  requestAnimationFrame(() => requestAnimationFrame(() => lanes.forEach((l,i) => {
+    const b=$("bar"+i); b.style.transition = reduce ? "none" : `width ${l.ms/10}ms linear`; b.style.width=(l.ms/maxMs*100)+"%";
+  })));
+});
+
+// heatmap
+const groups = [["末尾で分かる",[2,5,10]],["末尾2桁",[4]],["桁の和",[3,9]],["交代和",[11]]];
+let h = "<thead><tr><th></th>" + groups.map(([g,ds]) => `<th colspan="${ds.length}">${g}</th>`).join("") + "</tr>";
+h += "<tr><th class=row>桁数</th>" + groups.flatMap(([,ds]) => ds.map(d => `<th>÷${d}</th>`)).join("") + "</tr></thead><tbody>";
+for (const dg of D.digits) {
+  h += `<tr><th class="row">${dg}</th>`;
+  for (const [,ds] of groups) for (const d of ds) {
+    const [ok,n] = D.cells[dg+"_"+d]; const r = ok/n;
+    const t = Math.max(0, Math.min(1, (r-0.5)/0.5));
+    const bg = `color-mix(in srgb, var(--ink) ${Math.round(t*t*22)}%, var(--cellbg))`;
+    h += `<td class="${r<=0.6?"lo":""}" style="background:${bg}" title="${dg}桁 ÷${d}: ${ok}/${n}">${ok}/${n}</td>`;
+  }
+  h += "</tr>";
+}
+$("hm").innerHTML = h + "</tbody>";
+$("d11note").textContent = `÷11 は5桁から崩れる。6桁では ${D.d11_6.total}問中 ${D.d11_6.divisible}問が割り切れる数だったが、Jev が「割り切れる」と答えたのは ${D.d11_6.yes_said}問。分からないときは「いいえ」に倒れる。`;
+
+// examples
+$("ex").innerHTML = D.examples.map(e => `<div><span class="num">${e.n}</span>
+  <span class="v">Jev: 割り切れる確率 ${e.p.toFixed(2)} → <em>${e.p>=0.5?"割り切れる":"割り切れない"}</em>　正解: ${e.truth?"割り切れる":"割り切れない"}</span>
+  <span class="note">桁の和 ${e.digitsum}（${e.digitsum%3===0?"3の倍数":"3の倍数でない"}）</span></div>`).join("");
+</script>

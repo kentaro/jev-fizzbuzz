@@ -1,0 +1,1 @@
+{"label": "single 1問1リクエストを逐次200回", "numbers": 100, "fizzbuzz_acc": 1.0, "div3_acc": 1.0, "div5_acc": 1.0, "wrong": [], "ms": "omitted", "wall_ms": 146583, "fails": [], "p50": 628, "p95": 1216}
