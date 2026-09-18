@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@700&family=IBM+Plex+Mono:wght@600&display=swap">
+<style>
+:root{--paper:#F3F5F1;--grid:#DCE3E8;--ink:#1C2848;--soft:#5B6680;--rule:#C3CCD6;--pencil:#C33D2B;--fizz:#2D62B0;--buzz:#C9851A}
+html,body{margin:0;width:1200px;height:630px;overflow:hidden}
+body{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:30px 30px;color:var(--ink);font-family:"Zen Kaku Gothic New",sans-serif;box-sizing:border-box;padding:40px 56px 36px;display:flex;flex-direction:column;gap:22px}
+.l{display:flex;align-items:flex-end;justify-content:space-between;gap:32px}
+h1{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:76px;line-height:1;margin:0;white-space:nowrap}
+.sub{font-size:24px;line-height:1.45;text-align:right;white-space:nowrap}
+.sub b{color:var(--pencil)}
+.url{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--soft);text-align:right;margin-top:-6px}
+.r{display:grid;grid-template-columns:auto repeat(4,1fr) auto;gap:4px 14px;align-items:center}
+.h{font-size:16px;font-weight:700;border-bottom:3px solid var(--ink);padding-bottom:4px}
+.d,.a{font-family:"IBM Plex Mono",monospace;font-size:16px;line-height:1;text-align:right}
+.a.lo{color:var(--pencil)}
+.dots{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;height:22px}
+.dot{height:22px;box-sizing:border-box;background:#fff;border:1px solid var(--rule)}
+.dot.F{background:var(--fizz)}.dot.B{background:var(--buzz)}.dot.FB{background:linear-gradient(135deg,var(--fizz) 50%,var(--buzz) 50%)}
+.dot.x{outline:2px solid var(--pencil);position:relative;z-index:1}
+.dot.e{visibility:hidden}
+</style></head><body>
+<div class="l">
+  <h1>Jev の FizzBuzz</h1>
+  <div class="sub">3と5で割り切れるかだけを Jev に聞く<br>8桁まで全問正解、<b>30桁で 27/60</b></div>
+</div>
+<div class="r" id="r"></div>
+<div class="url">kentarokuribayashi.com/jev-fizzbuzz</div>
+<script>
+const D=/*DATA*/null;
+const cls=s=>s==="FizzBuzz"?"FB":s==="Fizz"?"F":s==="Buzz"?"B":"";
+const kindOf=w=>/^\d+$/.test(w)?"number":w;
+let h=`<div class="h">桁</div>`+["FizzBuzz","Fizz","Buzz","数字"].map(l=>`<div class="h">${l}</div>`).join("")+`<div class="h"></div>`;
+for(const s of D.steps){
+  h+=`<div class="d">${s.digits}</div>`;
+  for(const k of ["FizzBuzz","Fizz","Buzz","number"]){
+    const c=s.items.filter(i=>kindOf(i.want)===k).map(i=>`<span class="dot ${cls(i.got)} ${i.got===i.want?"":"x"}"></span>`);
+    while(c.length<15)c.push(`<span class="dot e"></span>`);
+    h+=`<div class="dots">${c.join("")}</div>`;
+  }
+  h+=`<div class="a ${s.fizzbuzz/s.n<0.9?"lo":""}">${s.fizzbuzz}/${s.n}</div>`;
+}
+document.getElementById("r").innerHTML=h;
+</script></body></html>

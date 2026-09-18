@@ -34,3 +34,7 @@ data = {
 tpl = (ROOT / "page.tpl.html").read_text()
 (ROOT / "index.html").write_text(tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False)))
 print("wrote index.html", [(s["digits"], s["fizzbuzz"], s["n"]) for s in steps])
+
+og = (ROOT / "og.tpl.html").read_text().replace("/*DATA*/null", json.dumps({"steps": steps}, ensure_ascii=False))
+(ROOT / "og.html").write_text(og)
+print("wrote og.html（headless Chrome で 1200x630 の og.png にする）")
