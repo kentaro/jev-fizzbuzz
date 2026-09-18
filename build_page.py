@@ -1,4 +1,4 @@
-"""results/*.jsonl から可視化ページ page.html を作る。数字はすべて実測ログから転記する。"""
+"""results/*.jsonl から可視化ページ index.html を作る。数字はすべて実測ログから転記する。"""
 import json
 import pathlib
 
@@ -44,5 +44,5 @@ data = {
 }
 
 tpl = (ROOT / "page.tpl.html").read_text()
-(ROOT / "page.html").write_text(tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False)))
-print("wrote page.html", {k: (v if not isinstance(v, (list, dict)) else len(v)) for k, v in data.items()})
+(ROOT / "index.html").write_text(tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False)))
+print("wrote index.html", {k: (v if not isinstance(v, (list, dict)) else len(v)) for k, v in data.items()})
